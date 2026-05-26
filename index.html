@@ -649,26 +649,43 @@ form.addEventListener('submit', function(e){
   // Evento de conversión para el Pixel
   if(window.fbq){ fbq('track','Lead',{content_name:data.producto}); }
 
-  btn.disabled = true; btn.textContent = "Enviando...";
+  btn.disabled = true; btn.textContent = "Abriendo WhatsApp...";
 
-  function exito(){
-    form.style.display='none';
-    msg.classList.add('show');
-    msg.scrollIntoView({behavior:'smooth',block:'center'});
+  // 1) GUARDA el lead en Google Sheets de forma confiable, incluso si el
+  //    navegador se va a WhatsApp enseguida. sendBeacon / keepalive aseguran
+  //    que la petición se complete aunque la página navegue.
+  function guardarLead(){
+    if(!APPS_SCRIPT_URL) return;
+    var payload = JSON.stringify(data);
+    try{
+      if(navigator.sendBeacon){
+        var blob = new Blob([payload], {type:'text/plain;charset=utf-8'});
+        navigator.sendBeacon(APPS_SCRIPT_URL, blob);
+      } else {
+        fetch(APPS_SCRIPT_URL, {
+          method:'POST', mode:'no-cors', keepalive:true,
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: payload
+        });
+      }
+    }catch(err){
+      try{ fetch(APPS_SCRIPT_URL, {method:'POST', mode:'no-cors', keepalive:true, body: payload}); }catch(e){}
+    }
   }
+  guardarLead();
 
-  if(APPS_SCRIPT_URL){
-    fetch(APPS_SCRIPT_URL, {
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body: JSON.stringify(data)
-    }).then(exito).catch(exito);
-  } else {
-    // Respaldo: abre WhatsApp con el resumen
-    window.open(waURL,'_blank');
-    exito();
-  }
+  // 2) Muestra la pantalla de confirmación (queda como respaldo por si el
+  //    navegador bloquea la apertura automática de WhatsApp).
+  form.style.display='none';
+  msg.classList.add('show');
+  msg.scrollIntoView({behavior:'smooth',block:'center'});
+
+  // 3) Envía el lead DIRECTO a WhatsApp con el resumen ya prellenado.
+  //    Se abre en pestaña nueva (conserva la landing); si el navegador la
+  //    bloquea, redirige en la misma pestaña. El botón "Continuar por
+  //    WhatsApp" del mensaje de gracias sirve como último respaldo.
+  var waWin = window.open(waURL, '_blank');
+  if(!waWin){ window.location.href = waURL; }
 });
 </script>
 </body>
