@@ -201,6 +201,11 @@ section{padding:78px 0}
 .form-card .fsub{color:var(--muted);font-size:.93rem;margin-bottom:20px}
 .frow{margin-bottom:14px}
 .frow.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checks{display:flex;flex-wrap:wrap;gap:10px}
+.chk{display:flex;align-items:center;gap:8px;font-weight:600;font-size:.92rem;margin:0;padding:11px 14px;border:1.5px solid var(--gris-b);border-radius:10px;cursor:pointer;flex:1;min-width:160px;transition:.15s border,.15s background}
+.chk:hover{border-color:var(--azul)}
+.chk input{width:auto;margin:0;accent-color:var(--azul);cursor:pointer}
+.chk:has(input:checked){border-color:var(--azul);background:rgba(2,3,254,.06)}
 label{display:block;font-size:.82rem;font-weight:700;margin-bottom:6px;color:var(--tinta)}
 input,select,textarea{width:100%;padding:12px 13px;border:1.5px solid var(--gris-b);border-radius:10px;font-family:inherit;font-size:.96rem;color:var(--tinta);background:#fff;transition:.15s border}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(2,3,254,.13)}
@@ -505,7 +510,7 @@ footer a:hover{color:#fff}
           <p class="fsub">Campos con * son obligatorios.</p>
           <div class="frow">
             <label for="nombre">Nombre completo *</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ej. Manuel Mora" required>
+            <input type="text" id="nombre" name="nombre" placeholder="Ej. Pánfilo Pérez" required>
           </div>
           <div class="frow two">
             <div>
@@ -523,36 +528,47 @@ footer a:hover{color:#fff}
               </select>
             </div>
           </div>
+          <div class="frow">
+            <label for="producto">Producto de interés *</label>
+            <select id="producto" name="producto" required>
+              <option value="" disabled selected>Selecciona</option>
+              <option>Reja de Acero</option>
+              <option>Cinta de Privacidad</option>
+              <option>Bardas / Muros Prefabricados</option>
+              <option>Cerca Texana</option>
+              <option>Poste Ganadero y Esquinero</option>
+              <option>Gavión</option>
+              <option>Geotextil</option>
+              <option>Malla Triple Torsión</option>
+              <option>Malla Ciclónica</option>
+              <option>Malla Graduada / Borreguera</option>
+              <option>Alambre de Púas</option>
+              <option>Concertina</option>
+              <option>Cerco Eléctrico Residencial</option>
+              <option>Cerco Eléctrico Agropecuario</option>
+              <option>Anclas para Paneles Solares</option>
+              <option>Malla Triple Nudo</option>
+              <option>Malla Sombra</option>
+              <option>Poste T</option>
+              <option>Productos de Sujeción</option>
+              <option>No estoy seguro / Asesoría</option>
+            </select>
+          </div>
           <div class="frow two">
             <div>
-              <label for="producto">Producto de interés *</label>
-              <select id="producto" name="producto" required>
-                <option value="" disabled selected>Selecciona</option>
-                <option>Reja de Acero</option>
-                <option>Cinta de Privacidad</option>
-                <option>Bardas / Muros Prefabricados</option>
-                <option>Cerca Texana</option>
-                <option>Poste Ganadero y Esquinero</option>
-                <option>Gavión</option>
-                <option>Geotextil</option>
-                <option>Malla Triple Torsión</option>
-                <option>Malla Ciclónica</option>
-                <option>Malla Graduada / Borreguera</option>
-                <option>Alambre de Púas</option>
-                <option>Concertina</option>
-                <option>Cerco Eléctrico Residencial</option>
-                <option>Cerco Eléctrico Agropecuario</option>
-                <option>Anclas para Paneles Solares</option>
-                <option>Malla Triple Nudo</option>
-                <option>Malla Sombra</option>
-                <option>Poste T</option>
-                <option>Productos de Sujeción</option>
-                <option>No estoy seguro / Asesoría</option>
-              </select>
+              <label for="metros">Metros lineales (aprox.)</label>
+              <input type="text" id="metros" name="metros" placeholder="Ej. 6 m">
             </div>
             <div>
-              <label for="metros">Metros lineales (aprox.)</label>
-              <input type="text" id="metros" name="metros" placeholder="Ej. 120 m">
+              <label for="altura">Altura (aprox.)</label>
+              <input type="text" id="altura" name="altura" placeholder="Ej. 1.5 m">
+            </div>
+          </div>
+          <div class="frow">
+            <label>¿Necesitas accesos? (opcional)</label>
+            <div class="checks">
+              <label class="chk" for="puerta"><input type="checkbox" id="puerta" name="puerta"> Puerta peatonal (1 m)</label>
+              <label class="chk" for="porton"><input type="checkbox" id="porton" name="porton"> Portón (4 m)</label>
             </div>
           </div>
           <div class="frow">
@@ -732,6 +748,9 @@ form.addEventListener('submit', function(e){
     tipo:     form.tipo.value,
     producto: form.producto.value,
     metros:   form.metros.value.trim(),
+    altura:   form.altura.value.trim(),
+    puerta:   form.puerta.checked ? "Sí (1 m)" : "No",
+    porton:   form.porton.checked ? "Sí (4 m)" : "No",
     zona:     form.zona.value.trim(),
     mensaje:  form.mensaje.value.trim(),
     origen:   "Landing mmcommerce.mx",
@@ -744,7 +763,10 @@ form.addEventListener('submit', function(e){
     + "%0A📞 " + encodeURIComponent(data.telefono)
     + "%0A🏷️ " + encodeURIComponent(data.tipo)
     + "%0A🧱 " + encodeURIComponent(data.producto)
-    + (data.metros ? "%0A📏 " + encodeURIComponent(data.metros) : "")
+    + (data.metros ? "%0A📏 Metros: " + encodeURIComponent(data.metros) : "")
+    + (data.altura ? "%0A📐 Altura: " + encodeURIComponent(data.altura) : "")
+    + "%0A🚪 Puerta peatonal (1m): " + encodeURIComponent(data.puerta)
+    + "%0A🔲 Portón (4m): " + encodeURIComponent(data.porton)
     + "%0A📍 " + encodeURIComponent(data.zona)
     + (data.mensaje ? "%0A📝 " + encodeURIComponent(data.mensaje) : "");
   var waURL = "https://wa.me/" + WHATSAPP_NUMERO + "?text=" + resumen;
